@@ -6,9 +6,16 @@ import controlP5.*;
 import de.bezier.data.sql.*;
 import de.bezier.data.sql.mapper.*;
 
+import wordcram.*;
 
 // Fields
 MySQL conn;
+
+
+// ControlP5
+ControlP5 cp5;
+ControlWindow controlWindow;
+Canvas cc;
 
 boolean sqlConnect() {
   conn = new MySQL(this, Database.host, Database.database, Database.user, Database.pass);
@@ -83,43 +90,8 @@ void prepareData(HashMap<String, Author> tbl) {
   println(String.format("Receptions: %d vs %d (errors)", Globals.countReceptions, countReceptionsErrors));
 }
 
-ControlP5 cp5;
-ControlWindow controlWindow;
-Canvas cc;
-// MyCanvas, your Canvas render class
-class MyCanvas extends Canvas {
-
-  int y;
-
-  public void setup(PApplet theApplet) {
-    y = 200;
-  }  
-
-  public void draw(PApplet p) {
-    // Set up the Processing sketch
-p.size(1000, 600);
-p.colorMode(HSB);
-p.background(230);
-
-// Make a wordcram from a random wikipedia page.
-new WordCram(p)
-  .fromWebPage("http://en.wikipedia.org/wiki/Special:Random")
-  .withColors(color(30), color(110),
-              color(random(255), 240, 200))
-  .sizedByWeight(5, 120)
-  .withFont("Copse")
-  .drawAll();
-  }
-}
-
-import wordcram.*;
-
-
-
 void draw() {
   background(0);
-  fill(60);
-  rect(100, 100, 200, 200);
 }
 
 void setup() {
@@ -128,13 +100,13 @@ void setup() {
     prepareData(Globals.authors);
   }
   
-  size(1000, 1000);
+  size(Globals.frameWidth, Globals.frameHeight);
   frameRate(30);
   cp5 = new ControlP5(this);
 
   // create a control window canvas and add it to
   // the previously created control window.  
-  cc = new MyCanvas();
+  cc = new WordCloudCanvas();
   cc.pre(); // use cc.post(); to draw on top of existing controllers.
   cp5.addCanvas(cc); // add the canvas to cp5
 }

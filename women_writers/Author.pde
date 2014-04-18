@@ -12,4 +12,12 @@ class Author {
   String toString() {
     return name + " (" + country + ")";
   }
+  
+  public int numOfReceptions() {
+    return works.size();
+  }
+  
+  public int count(String type) {
+    return numOfReceptions();
+  }
 }
