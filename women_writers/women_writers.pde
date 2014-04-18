@@ -7,14 +7,11 @@ import de.bezier.data.sql.*;
 import de.bezier.data.sql.mapper.*;
 
 
-
 // Fields
 MySQL conn;
-HashMap<String, Author> authors;
-int countAuthors = 0, countWorks = 0, countReceptions = 0;
 
 boolean sqlConnect() {
-  conn = new MySQL( this, "delphi.fri.uni-lj.si:3306", database, user, pass );
+  conn = new MySQL(this, Database.host, Database.database, Database.user, Database.pass);
   return conn.connect();
 }
 
@@ -24,7 +21,7 @@ int getDbInt(String res) {
     return Integer.parseInt(res);
   }
   catch (Exception e) {
-    println(res);
+    println("!!! Not a year: " + res);
     return 0;
   }
 }
@@ -40,7 +37,7 @@ void prepareData(HashMap<String, Author> tbl) {
     a.country = conn.getString("drzava");
     a.language = conn.getString("jezik");
     tbl.put(a.name, a);
-    countAuthors++;
+    Globals.countAuthors++;
   }
   conn.query( "SELECT * FROM dela;" );
   while (conn.next()) {
@@ -52,7 +49,7 @@ void prepareData(HashMap<String, Author> tbl) {
     Author a = tbl.get(w.name);
     if (a != null) {
       a.works.add(w);
-      countWorks++;
+      Globals.countWorks++;
     }
     else {
       countWorksErrors++;
@@ -75,23 +72,69 @@ void prepareData(HashMap<String, Author> tbl) {
     Author a = tbl.get(r.name);
     if (a != null) {
       a.receptors.add(r);
-      countReceptions++;
+      Globals.countReceptions++;
     }
     else {
       countReceptionsErrors++;
     }
   }
-  println(String.format("Authors: %d", countAuthors));
-  println(String.format("Works: %d vs %d (errors)", countWorks, countWorksErrors));
-  println(String.format("Receptions: %d vs %d (errors)", countReceptions, countReceptionsErrors));
+  println(String.format("Authors: %d", Globals.countAuthors));
+  println(String.format("Works: %d vs %d (errors)", Globals.countWorks, countWorksErrors));
+  println(String.format("Receptions: %d vs %d (errors)", Globals.countReceptions, countReceptionsErrors));
+}
+
+ControlP5 cp5;
+ControlWindow controlWindow;
+Canvas cc;
+// MyCanvas, your Canvas render class
+class MyCanvas extends Canvas {
+
+  int y;
+
+  public void setup(PApplet theApplet) {
+    y = 200;
+  }  
+
+  public void draw(PApplet p) {
+    // Set up the Processing sketch
+p.size(1000, 600);
+p.colorMode(HSB);
+p.background(230);
+
+// Make a wordcram from a random wikipedia page.
+new WordCram(p)
+  .fromWebPage("http://en.wikipedia.org/wiki/Special:Random")
+  .withColors(color(30), color(110),
+              color(random(255), 240, 200))
+  .sizedByWeight(5, 120)
+  .withFont("Copse")
+  .drawAll();
+  }
+}
+
+import wordcram.*;
+
+
+
+void draw() {
+  background(0);
+  fill(60);
+  rect(100, 100, 200, 200);
 }
 
 void setup() {
-  authors = new HashMap<String, Author>();
+  Globals.authors = new HashMap<String, Author>();
   if (sqlConnect()) {
-    prepareData(authors);
+    prepareData(Globals.authors);
   }
-}
-void draw() {
+  
+  size(1000, 1000);
+  frameRate(30);
+  cp5 = new ControlP5(this);
 
+  // create a control window canvas and add it to
+  // the previously created control window.  
+  cc = new MyCanvas();
+  cc.pre(); // use cc.post(); to draw on top of existing controllers.
+  cp5.addCanvas(cc); // add the canvas to cp5
 }
