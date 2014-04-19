@@ -1,6 +1,6 @@
 import java.util.Map;
 import java.util.LinkedList;
-
+import java.util.Iterator;
 import controlP5.*;
 
 import de.bezier.data.sql.*;
@@ -10,12 +10,14 @@ import wordcram.*;
 
 // Fields
 MySQL conn;
-
+Word[] words = null;
+WordCram wc = null;
 
 // ControlP5
 ControlP5 cp5;
 ControlWindow controlWindow;
 Canvas cc;
+DropdownList d1, d2;
 
 boolean sqlConnect() {
   conn = new MySQL(this, Database.host, Database.database, Database.user, Database.pass);
@@ -88,10 +90,26 @@ void prepareData(HashMap<String, Author> tbl) {
   println(String.format("Authors: %d", Globals.countAuthors));
   println(String.format("Works: %d vs %d (errors)", Globals.countWorks, countWorksErrors));
   println(String.format("Receptions: %d vs %d (errors)", Globals.countReceptions, countReceptionsErrors));
+  
 }
 
 void draw() {
-  background(0);
+  if (Globals.viewMode == Globals.VIEW_MODE_CLOUD) {
+    if (words == null) {        
+      prepareWords();
+    }
+    if (wc == null) {
+      initWordCloud();
+    }
+    drawWordCloud(10);
+
+  }
+  else if (Globals.viewMode == Globals.VIEW_MODE_INFO) {
+    
+  }
+  else if (Globals.viewMode == Globals.VIEW_MODE_CONTROL) {
+    
+  }
 }
 
 void setup() {
@@ -100,13 +118,53 @@ void setup() {
     prepareData(Globals.authors);
   }
   
-  size(Globals.frameWidth, Globals.frameHeight);
+  size(Globals.FRAME_WIDTH, Globals.FRAME_HEIGHT);
   frameRate(30);
-  cp5 = new ControlP5(this);
+  gui();
+  //smooth();
+}
 
-  // create a control window canvas and add it to
-  // the previously created control window.  
-  cc = new WordCloudCanvas();
-  cc.pre(); // use cc.post(); to draw on top of existing controllers.
-  cp5.addCanvas(cc); // add the canvas to cp5
+void gui() {
+  cp5 = new ControlP5(this);
+}
+
+void prepareWords() {
+  Iterator it;
+  int valid = 0;
+  LinkedList<Word> authors = new LinkedList<Word>();   
+  it = Globals.authors.entrySet().iterator();
+  for (int i = 0; it.hasNext(); i++) {
+    Map.Entry pairs = (Map.Entry)it.next();
+    Author a = (Author)pairs.getValue();
+    int val = a.count("something")+1;
+    if (val > 5) {
+      authors.add(new Word(a.name, val));
+      valid++;
+    }        
+  }
+  println("Valid for cloud: " + valid);
+  words = new Word[valid];
+  it = authors.iterator();
+  for (int i = 0; it.hasNext(); i++) {
+    words[i] = (Word)it.next();
+  }
+}
+
+void initWordCloud() {
+  colorMode(HSB);
+  background(230);
+  wc = new WordCram(this)
+    .fromWords(words)
+    .withColors(color(30), color(110),
+                color(random(255), 240, 200))
+    .sizedByWeight(5, 120)
+    .withFont("Copse");
+}
+
+void drawWordCloud(int n) {
+  for (int i = 0; i < n; i++) {
+    if (wc.hasMore()) {
+      wc.drawNext();
+    }
+  }
 }
