@@ -105,11 +105,23 @@ void draw() {
 
   }
   else if (Globals.viewMode == Globals.VIEW_MODE_INFO) {
+    // show author info
     
   }
-  else if (Globals.viewMode == Globals.VIEW_MODE_CONTROL) {
-    
-  }
+  clear(); // currently important but maybe we won't need it
+  // because we will redraw the cloud when a dropdown changes
+}
+
+void clear() {
+  // We cannot draw the word cloud everytime but we have
+  // to somehow clear ControlP5 ... so we clear it with
+  // a rect that has the same color as the background
+  // and WOLA, MAGIC, works
+  
+  fill(230);
+  noStroke();
+  rectMode(CORNER);
+  rect(0, 0, Globals.FRAME_WIDTH, 150);
 }
 
 void setup() {
@@ -120,12 +132,20 @@ void setup() {
   
   size(Globals.FRAME_WIDTH, Globals.FRAME_HEIGHT);
   frameRate(30);
+  
   gui();
   //smooth();
 }
 
 void gui() {
   cp5 = new ControlP5(this);
+  
+  DropdownList d2 = cp5.addDropdownList("myList-d2")
+    .setPosition(10, 20)
+    .setSize(150, 100) // this somehow also influences the open dropdown size (NOTE: somehow)
+    ;
+  customize(d2);
+  d2.setIndex(10);
 }
 
 void prepareWords() {
@@ -167,4 +187,21 @@ void drawWordCloud(int n) {
       wc.drawNext();
     }
   }
+}
+
+void customize(DropdownList ddl) {
+  // a convenience function to customize a DropdownList
+  ddl.setBackgroundColor(color(190));
+  ddl.setItemHeight(15);
+  ddl.setBarHeight(15);
+  ddl.captionLabel().set("dropdown");
+  ddl.captionLabel().style().marginTop = 3;
+  ddl.captionLabel().style().marginLeft = 3;
+  ddl.valueLabel().style().marginTop = 3;
+  for (int i=0;i<10;i++) {
+    ddl.addItem("item "+i, i);
+  }
+  //ddl.scroll(0);
+  ddl.setColorBackground(color(60));
+  ddl.setColorActive(color(255, 128));
 }

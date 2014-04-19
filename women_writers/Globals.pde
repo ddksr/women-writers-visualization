@@ -1,7 +1,6 @@
 static class Globals {
   // Constants
-  public static final int VIEW_MODE_CLOUD = 0, VIEW_MODE_INFO = 1,
-    VIEW_MODE_CONTROL = 2;
+  public static final int VIEW_MODE_CLOUD = 0, VIEW_MODE_INFO = 1;
   public static final int FRAME_WIDTH=1000, FRAME_HEIGHT=800;
   public static final int WORD_CLOUD_WIDTH=600, WORD_CLOUD_HEIGHT=600;
   // States
