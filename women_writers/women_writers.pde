@@ -2,6 +2,8 @@ import java.util.Map;
 import java.util.LinkedList;
 import java.util.Iterator;
 import controlP5.*;
+import java.util.List;
+
 
 import de.bezier.data.sql.*;
 import de.bezier.data.sql.mapper.*;
@@ -11,6 +13,8 @@ import wordcram.*;
 // Fields
 MySQL conn;
 Word[] words = null;
+//words to display on current selection
+Word[] toDisplay = null;
 WordCram wc = null;
 
 // ControlP5
@@ -169,12 +173,31 @@ void prepareWords() {
     words[i] = (Word)it.next();
   }
 }
-
+public List<Word> getAuthors (char character){
+  //method for filtering authors whose name/surname begins with character
+  List<Word> list = new LinkedList<Word>();
+  for (Word w : words){
+    char firstChar = w.toString().charAt(0);
+    if (firstChar == character){
+      list.add(w);
+    }
+  }
+   return list;
+}
 void initWordCloud() {
   colorMode(HSB);
   background(230);
+  //get values from checkbox - todo, for now = 'A'
+  List<Word> f = getAuthors ('A');
+  //convert from linked list to table...(.fromWords dosn't accept linked lists...)
+  Word[] toDisplay = new Word[f.size()];
+  int c = 0;
+  for (Word t : f){
+    toDisplay[c] = t;
+    c++;
+  }
   wc = new WordCram(this)
-    .fromWords(words)
+    .fromWords(toDisplay)
     .withColors(color(30), color(110),
                 color(random(255), 240, 200))
     .sizedByWeight(5, 120)
