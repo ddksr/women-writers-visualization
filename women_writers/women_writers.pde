@@ -16,6 +16,9 @@ Word[] words = null;
 //words to display on current selection
 Word[] toDisplay = null;
 WordCram wc = null;
+//checkbox for alphabet
+CheckBox checkbox;
+char[] alphabet = {'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'};
 
 // ControlP5
 ControlP5 cp5;
@@ -150,6 +153,88 @@ void gui() {
     ;
   customize(d2);
   d2.setIndex(10);
+  
+  checkbox = cp5.addCheckBox("checkBox")
+                .setPosition(600, 50)
+                .setColorForeground(color(120))
+                .setColorActive(color(200))
+                .setColorLabel(color(50))
+                .setSize(20, 20)
+                .setItemsPerRow(13)
+                .setSpacingColumn(20)
+                .setSpacingRow(20)
+                .addItem("A", 0)
+                .addItem("B", 1)
+                .addItem("C", 2)
+                .addItem("D", 3)
+                .addItem("E", 4)
+                .addItem("F", 5)
+                .addItem("G", 6)
+                .addItem("H", 7)
+                .addItem("I", 8)
+                .addItem("J", 9)
+                .addItem("K", 10)
+                .addItem("L", 11)
+                .addItem("M", 12)
+                .addItem("N", 13)
+                .addItem("O", 14)
+                .addItem("P", 15)
+                .addItem("Q", 16)
+                .addItem("R", 17)
+                .addItem("S", 18)
+                .addItem("T", 19)
+                .addItem("U", 20)
+                .addItem("V", 21)
+                .addItem("W", 22)
+                .addItem("X", 23)
+                .addItem("Y", 24)
+                .addItem("Z", 25)
+                ;
+}
+//for checkbox
+void keyPressed() {
+  if (key==' ') {
+    checkbox.deactivateAll();
+  } 
+  else {
+    for (int i=0;i<6;i++) {
+      // check if key 0-5 have been pressed and toggle
+      // the checkbox item accordingly.
+      if (keyCode==(48 + i)) { 
+        // the index of checkbox items start at 0
+        checkbox.toggle(i);
+        println("toggle "+checkbox.getItem(i).name());
+        // also see 
+        // checkbox.activate(index);
+        // checkbox.deactivate(index);
+      }
+    }
+  }
+}
+
+void controlEvent(ControlEvent theEvent) {
+  char newC = ' ';
+  //problem: when event is triggered, we have to redraw the whole thing
+  if (theEvent.isFrom(checkbox)) {
+    print("got an event from "+checkbox.getName()+"\t\n");
+    // checkbox uses arrayValue to store the state of 
+    // individual checkbox-items. usage:
+    //println(checkbox.getArrayValue());
+    int col = 0;
+    for (int i=0;i<checkbox.getArrayValue().length;i++) {
+      int h = (int)checkbox.getArrayValue()[i];
+      if (h == 1){
+        newC = alphabet[i];
+      }
+      print(h);
+    }
+    println();
+    println(String.format("Characetrs to add: %c", newC));
+  }
+}
+
+void checkBox(float[] a) {
+  //println(a);
 }
 
 void prepareWords() {
@@ -173,13 +258,15 @@ void prepareWords() {
     words[i] = (Word)it.next();
   }
 }
-public List<Word> getAuthors (char character){
-  //method for filtering authors whose name/surname begins with character
+public List<Word> getAuthors (char[] characters){
+  //method for filtering authors whose name/surname begins with characters
   List<Word> list = new LinkedList<Word>();
   for (Word w : words){
-    char firstChar = w.toString().charAt(0);
-    if (firstChar == character){
-      list.add(w);
+    for (char c : characters){
+      char firstChar = w.toString().charAt(0);
+      if (firstChar == c){
+        list.add(w);
+      }
     }
   }
    return list;
@@ -187,8 +274,9 @@ public List<Word> getAuthors (char character){
 void initWordCloud() {
   colorMode(HSB);
   background(230);
-  //get values from checkbox - todo, for now = 'A'
-  List<Word> f = getAuthors ('A');
+  //get values from checkbox - todo, for now = 'A','B'
+  char[] d = {'A','B'};
+  List<Word> f = getAuthors (d);
   //convert from linked list to table...(.fromWords dosn't accept linked lists...)
   Word[] toDisplay = new Word[f.size()];
   int c = 0;
