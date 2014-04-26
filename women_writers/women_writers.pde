@@ -12,6 +12,7 @@ import wordcram.*;
 
 // Fields
 boolean clear = true;
+boolean loading = true;
 MySQL conn;
 Word[] words = null;
 //words to display on current selection
@@ -25,7 +26,7 @@ char[] alphabet = {'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','
 ControlP5 cp5;
 ControlWindow controlWindow;
 Canvas cc;
-DropdownList d1, d2;
+DropdownList ddSize, ddColor;
 
 boolean sqlConnect() {
   conn = new MySQL(this, Database.host, Database.database, Database.user, Database.pass);
@@ -102,7 +103,16 @@ void prepareData(HashMap<String, Author> tbl) {
 }
 
 void draw() {
-  if (Globals.viewMode == Globals.VIEW_MODE_CLOUD) {
+  if (loading) {
+    PFont font = createFont("Arial", 50,true); 
+    background(230);
+    textAlign(CENTER);
+    textFont(font);
+    fill(0);
+    text("Loading ... ", Globals.FRAME_WIDTH / 2, Globals.FRAME_HEIGHT / 2);
+    loading = false;
+  }
+  else if (Globals.viewMode == Globals.VIEW_MODE_CLOUD) {
     if (words == null) {        
       prepareWords();
     }
@@ -148,12 +158,12 @@ void setup() {
 void gui() {
   cp5 = new ControlP5(this);
   
-  DropdownList d2 = cp5.addDropdownList("myList-d2")
+  ddSize = cp5.addDropdownList("size")
     .setPosition(10, 20)
     .setSize(150, 100) // this somehow also influences the open dropdown size (NOTE: somehow)
     ;
-  customize(d2);
-  d2.setIndex(10);
+  customizeDropdown(ddSize, Globals.sizeOptionTitle, Globals.sizeOptions);
+  ddSize.setIndex(10);
   
   checkbox = cp5.addCheckBox("checkBox")
                 .setPosition(600, 50)
@@ -235,12 +245,22 @@ void controlEvent(ControlEvent theEvent) {
     }
     println();
     println(String.format("Characetrs to add: %c", newC));
-    words = null;
+    resetView();
+  }
+  if(theEvent.isFrom(ddSize)) {
+    if (theEvent.isGroup()) {
+      Globals.sizeParameter = (int)theEvent.getGroup().getValue();
+    } 
+    else if (theEvent.isController()) {
+      Globals.sizeParameter = (int)theEvent.getController().getValue();
+    }
+    resetView();
   }
 }
 
-void checkBox(float[] a) {
-  //println(a);
+void resetView() {
+  loading = true;
+  words = null;
 }
 
 void prepareWords() {
@@ -251,8 +271,8 @@ void prepareWords() {
   for (int i = 0; it.hasNext(); i++) {
     Map.Entry pairs = (Map.Entry)it.next();
     Author a = (Author)pairs.getValue();
-    int val = a.count("something")+1;
-    if (val > 5) {
+    int val = a.sizeParameter(Globals.sizeParameter);
+    if (val > a.minSizeParameter(Globals.sizeParameter)) {
       authors.add(new Word(a.name, val));
       valid++;
     }        
@@ -311,17 +331,17 @@ void drawWordCloud(int n) {
   }
 }
 
-void customize(DropdownList ddl) {
+void customizeDropdown(DropdownList ddl, String title, String[] options) {
   // a convenience function to customize a DropdownList
   ddl.setBackgroundColor(color(190));
   ddl.setItemHeight(15);
   ddl.setBarHeight(15);
-  ddl.captionLabel().set("dropdown");
+  ddl.captionLabel().set(title);
   ddl.captionLabel().style().marginTop = 3;
   ddl.captionLabel().style().marginLeft = 3;
   ddl.valueLabel().style().marginTop = 3;
-  for (int i=0;i<10;i++) {
-    ddl.addItem("item "+i, i);
+  for (int i=0; i<options.length; i++) {
+    ddl.addItem(options[i], i);
   }
   //ddl.scroll(0);
   ddl.setColorBackground(color(60));

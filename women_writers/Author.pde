@@ -14,10 +14,32 @@ class Author {
   }
   
   public int numOfReceptions() {
-    return works.size();
+    return receptors.size();
   }
+
+  public int numOfWorks() {
+    return works.size();
+  };
   
-  public int count(String type) {
-    return numOfReceptions();
+  public int sizeParameter(int type) {
+    switch(type) {
+    case Globals.SIZE_OPTION_NUM_OF_RECEPTIONS:
+      return numOfReceptions();
+    case Globals.SIZE_OPTION_NUM_OF_WORKS:
+      return numOfWorks();
+    default:
+      return numOfReceptions();
+    }
+  }
+
+  public int minSizeParameter(int type) {
+    switch(type) {
+    case Globals.SIZE_OPTION_NUM_OF_RECEPTIONS:
+      return 5;
+    case Globals.SIZE_OPTION_NUM_OF_WORKS:
+      return 5;
+    default:
+      return 5;
+    }    
   }
 }
