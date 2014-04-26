@@ -7,4 +7,10 @@ static class Globals {
   public static HashMap<String, Author> authors;
   public static int countAuthors = 0, countWorks = 0, countReceptions = 0;
   public static int viewMode = VIEW_MODE_CLOUD;
+  public static boolean[] pressedChars = new boolean [26];
+
+  // Helpers
+  public static boolean validChar(int c) {
+    return c >=0 && c < 26;
+  }
 }

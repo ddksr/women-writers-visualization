@@ -11,6 +11,7 @@ import de.bezier.data.sql.mapper.*;
 import wordcram.*;
 
 // Fields
+boolean clear = true;
 MySQL conn;
 Word[] words = null;
 //words to display on current selection
@@ -225,11 +226,16 @@ void controlEvent(ControlEvent theEvent) {
       int h = (int)checkbox.getArrayValue()[i];
       if (h == 1){
         newC = alphabet[i];
+        Globals.pressedChars[i] = true;
+      }
+      else {
+        Globals.pressedChars[i] = false;
       }
       print(h);
     }
     println();
     println(String.format("Characetrs to add: %c", newC));
+    words = null;
   }
 }
 
@@ -257,26 +263,31 @@ void prepareWords() {
   for (int i = 0; it.hasNext(); i++) {
     words[i] = (Word)it.next();
   }
+  wc = null; // clear word cloud
 }
-public List<Word> getAuthors (char[] characters){
+public List<Word> getAuthors (){
   //method for filtering authors whose name/surname begins with characters
   List<Word> list = new LinkedList<Word>();
+  int markedChars = 0;
+  for (int i = 0; i < 26; i++) {
+    if (Globals.pressedChars[i]) { markedChars++; }
+  }
   for (Word w : words){
-    for (char c : characters){
-      char firstChar = w.toString().charAt(0);
-      if (firstChar == c){
-        list.add(w);
-      }
+    char firstChar = w.toString().charAt(0);
+    int charVal = (int)firstChar - 65;
+    boolean valid = Globals.validChar(charVal) && Globals.pressedChars[charVal];
+    if (valid || markedChars == 0){
+      list.add(w);
     }
+
   }
    return list;
 }
 void initWordCloud() {
   colorMode(HSB);
   background(230);
-  //get values from checkbox - todo, for now = 'A','B'
-  char[] d = {'A','B'};
-  List<Word> f = getAuthors (d);
+
+  List<Word> f = getAuthors ();
   //convert from linked list to table...(.fromWords dosn't accept linked lists...)
   Word[] toDisplay = new Word[f.size()];
   int c = 0;
