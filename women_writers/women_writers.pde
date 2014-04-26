@@ -268,11 +268,12 @@ void prepareWords() {
   int valid = 0;
   LinkedList<Word> authors = new LinkedList<Word>();   
   it = Globals.authors.entrySet().iterator();
+  boolean charsMarked = charsMarked();
   for (int i = 0; it.hasNext(); i++) {
     Map.Entry pairs = (Map.Entry)it.next();
     Author a = (Author)pairs.getValue();
     int val = a.sizeParameter(Globals.sizeParameter);
-    if (val > a.minSizeParameter(Globals.sizeParameter)) {
+    if (val > a.minSizeParameter(Globals.sizeParameter, charsMarked)) {
       authors.add(new Word(a.name, val));
       valid++;
     }        
@@ -288,21 +289,26 @@ void prepareWords() {
 public List<Word> getAuthors (){
   //method for filtering authors whose name/surname begins with characters
   List<Word> list = new LinkedList<Word>();
-  int markedChars = 0;
-  for (int i = 0; i < 26; i++) {
-    if (Globals.pressedChars[i]) { markedChars++; }
-  }
+  boolean charsMarked = charsMarked();
   for (Word w : words){
     char firstChar = w.toString().charAt(0);
     int charVal = (int)firstChar - 65;
     boolean valid = Globals.validChar(charVal) && Globals.pressedChars[charVal];
-    if (valid || markedChars == 0){
+    if (valid || !charsMarked){
       list.add(w);
     }
 
   }
    return list;
 }
+
+boolean charsMarked() {
+  for (int i = 0; i < 26; i++) {
+    if (Globals.pressedChars[i]) { return true; }
+  }
+  return false;
+}
+
 void initWordCloud() {
   colorMode(HSB);
   background(230);

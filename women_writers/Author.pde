@@ -32,14 +32,14 @@ class Author {
     }
   }
 
-  public int minSizeParameter(int type) {
+  public int minSizeParameter(int type, boolean charMode) {
     switch(type) {
     case Globals.SIZE_OPTION_NUM_OF_RECEPTIONS:
-      return 5;
+      return charMode ? 4 : 7;
     case Globals.SIZE_OPTION_NUM_OF_WORKS:
-      return 5;
+      return charMode ? 4 : 7;
     default:
-      return 5;
+      return charMode ? 4 : 7;
     }    
   }
 }
