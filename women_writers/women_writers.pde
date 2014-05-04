@@ -28,7 +28,9 @@ char[] alphabet = {'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','
 ControlP5 cp5;
 ControlWindow controlWindow;
 Canvas cc;
+Group groupAuthorInfo;
 DropdownList ddSize, ddColor;
+Textlabel aiTitle, aiCountryLanguage;
 
 boolean sqlConnect() {
   conn = new MySQL(this, Database.host, Database.database, Database.user, Database.pass);
@@ -131,19 +133,50 @@ void draw() {
     }
     if (wc == null) {
       initWordCloud();
+      groupAuthorInfo.hide();
     }
     drawWordCloud(10);
-
+    if (mouseY > 150 && mouseY < (Globals.FRAME_HEIGHT - 100)) {
+      cursor(HAND);
+    } else {
+      cursor(ARROW);
+    }
   }
   else if (Globals.viewMode == Globals.VIEW_MODE_INFO) {
-    // show author info
-    
+    if (Globals.selectedAuthor != null) {
+      Author a = Globals.selectedAuthor;
+      Globals.selectedAuthor = null;
+      resetView();
+      cursor(ARROW);
+      colorMode(HSB);
+      background(230);
+      groupAuthorInfo.show();
+      aiTitle.setText(a.name);
+      String countryLanguage = new String(a.country != null ? a.country : "Country unknown");
+      countryLanguage += ", ";
+      countryLanguage += a.language != null ? a.language : "Language unknown";
+      
+
+      String life = new String("");
+      if (a.yBirth > 0) { life = new String("* " + a.yBirth); }
+      if (a.yBirth > 0 && a.yDeath > 0) {
+        life += new String(" † " + a.yBirth);
+      }
+      else if (a.yDeath > 0) {
+        life = new String("* unknown † " + a.yBirth);
+      }
+      else if (a.yDeath == 0) {
+        life = new String("Born " + life.substring(2));
+      }
+      else {
+        life = new String("Year of birth and death unknown");
+      }
+      if (life.length() > 0) { life = ", " + life; }
+      aiCountryLanguage.setText(countryLanguage + life);
+
+    }
   }
-  if (mouseY > 150 && mouseY < (Globals.FRAME_HEIGHT - 100)) {
-    cursor(HAND);
-  } else {
-    cursor(ARROW);
-  }
+  
   clear(); // currently important but maybe we won't need it
   // because we will redraw the cloud when a dropdown changes
 }
@@ -152,8 +185,7 @@ void clear() {
   // We cannot draw the word cloud everytime but we have
   // to somehow clear ControlP5 ... so we clear it with
   // a rect that has the same color as the background
-  // and WOLA, MAGIC, works
-  
+  // and WOLA, MAGIC, work
   fill(230);
   noStroke();
   rectMode(CORNER);
@@ -202,15 +234,58 @@ void gui() {
   for (int i = 0; i < 26; i++) {
     checkbox.addItem(alphabet[i] + "", i);
   }
+
+  groupAuthorInfo = cp5.addGroup("g2")
+    .setPosition(0,150)
+    .setWidth(Globals.FRAME_WIDTH)
+    .activateEvent(true)
+    .setBackgroundColor(color(230))
+    .setBackgroundHeight(Globals.FRAME_HEIGHT - 170)
+    .setLabel("Author info")
+    .hide()
+    .hideBar()
+    ;
+  authorInfoGui();
 }
+
+void authorInfoGui() {
+  cp5.addButton("aiButtonClose")
+    .setPosition(Globals.FRAME_WIDTH - 40,10)
+    .setSize(30,19)
+    .setLabel("Close")
+    .setGroup(groupAuthorInfo)
+    ;
+  aiTitle = cp5.addTextlabel("authorName")
+    .setPosition(10, 10)
+    .setColor(color(30))
+    .setText("Author")
+    .setFont(createFont("Copse", 26))
+    .setGroup(groupAuthorInfo)
+    ;
+  aiCountryLanguage = cp5.addTextlabel("authorCountry")
+    .setPosition(10, 50)
+    .setColor(color(30))
+    .setText("Country")
+    .setFont(createFont("Copse", 20))
+    .setGroup(groupAuthorInfo)
+    ;
+
+}
+
+void aiButtonClose() {
+  resetView();
+  Globals.viewMode = Globals.VIEW_MODE_CLOUD;
+  groupAuthorInfo.hide();
+  
+}
+
 // for word cloud
 void mouseClicked() {
   if (wc != null) {
     Word word = wc.getWordAt(mouseX, mouseY);
     if (word != null) {
-      println(word);
       Globals.selectedAuthor = (Author)word.getProperty("info");
-      println(Globals.selectedAuthor);
+      Globals.viewMode = Globals.VIEW_MODE_INFO;
     }
   }
 }
@@ -284,6 +359,7 @@ void controlEvent(ControlEvent theEvent) {
 void resetView() {
   loading = true;
   words = null;
+  legend = false;
 }
 
 void prepareWords() {
@@ -391,7 +467,7 @@ void drawLegend() {
     if (i%3 == 0) { xOffset = 10; yOffset += 20; }
     drawLegendElement(xOffset, yOffset,
                       colors.legendColors[i], colors.legendValues[i]);
-    xOffset += 250; //(20 + 8 * colors.legendValues[i].length());
+    xOffset += 300; //(20 + 8 * colors.legendValues[i].length());
   }
   if (colors.numColors % 3 == 0) { xOffset = 10; yOffset += 20; }
   drawLegendElement(xOffset, yOffset,
