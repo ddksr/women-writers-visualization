@@ -13,11 +13,13 @@ import wordcram.*;
 // Fields
 boolean clear = true;
 boolean loading = true;
+boolean legend = false;
 MySQL conn;
 Word[] words = null;
 //words to display on current selection
 Word[] toDisplay = null;
 WordCram wc = null;
+ColorManager colors = new ColorManager();
 //checkbox for alphabet
 CheckBox checkbox;
 char[] alphabet = {'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'};
@@ -96,6 +98,16 @@ void prepareData(HashMap<String, Author> tbl) {
       countReceptionsErrors++;
     }
   }
+
+  Iterator it = tbl.entrySet().iterator();
+  while (it.hasNext()) {
+    Map.Entry pairs = (Map.Entry)it.next();
+    Author a = (Author)pairs.getValue();
+    a.initColorParams();
+  }
+
+  initWordColors();
+  
   println(String.format("Authors: %d", Globals.countAuthors));
   println(String.format("Works: %d vs %d (errors)", Globals.countWorks, countWorksErrors));
   println(String.format("Receptions: %d vs %d (errors)", Globals.countReceptions, countReceptionsErrors));
@@ -110,6 +122,7 @@ void draw() {
     textFont(font);
     fill(0);
     text("Loading ... ", Globals.FRAME_WIDTH / 2, Globals.FRAME_HEIGHT / 2);
+
     loading = false;
   }
   else if (Globals.viewMode == Globals.VIEW_MODE_CLOUD) {
@@ -164,43 +177,26 @@ void gui() {
     ;
   customizeDropdown(ddSize, Globals.sizeOptionTitle, Globals.sizeOptions);
   ddSize.setIndex(10);
+
+  ddColor = cp5.addDropdownList("color")
+    .setPosition(160, 20)
+    .setSize(150, 100) // this somehow also influences the open dropdown size (NOTE: somehow)
+    ;
+  customizeDropdown(ddColor, Globals.colorOptionTitle, Globals.colorOptions);
+  ddSize.setIndex(10);
   
   checkbox = cp5.addCheckBox("checkBox")
-                .setPosition(600, 50)
-                .setColorForeground(color(120))
-                .setColorActive(color(200))
-                .setColorLabel(color(50))
-                .setSize(20, 20)
-                .setItemsPerRow(13)
-                .setSpacingColumn(20)
-                .setSpacingRow(20)
-                .addItem("A", 0)
-                .addItem("B", 1)
-                .addItem("C", 2)
-                .addItem("D", 3)
-                .addItem("E", 4)
-                .addItem("F", 5)
-                .addItem("G", 6)
-                .addItem("H", 7)
-                .addItem("I", 8)
-                .addItem("J", 9)
-                .addItem("K", 10)
-                .addItem("L", 11)
-                .addItem("M", 12)
-                .addItem("N", 13)
-                .addItem("O", 14)
-                .addItem("P", 15)
-                .addItem("Q", 16)
-                .addItem("R", 17)
-                .addItem("S", 18)
-                .addItem("T", 19)
-                .addItem("U", 20)
-                .addItem("V", 21)
-                .addItem("W", 22)
-                .addItem("X", 23)
-                .addItem("Y", 24)
-                .addItem("Z", 25)
-                ;
+    .setPosition(600, 20)
+    .setColorForeground(color(120))
+    .setColorActive(color(200))
+    .setColorLabel(color(50))
+    .setSize(20, 20)
+    .setItemsPerRow(13)
+    .setSpacingColumn(20)
+    .setSpacingRow(20);
+  for (int i = 0; i < 26; i++) {
+    checkbox.addItem(alphabet[i] + "", i);
+  }
 }
 //for checkbox
 void keyPressed() {
@@ -256,6 +252,16 @@ void controlEvent(ControlEvent theEvent) {
     }
     resetView();
   }
+  if(theEvent.isFrom(ddColor)) {
+    if (theEvent.isGroup()) {
+      Globals.colorParameter = (int)theEvent.getGroup().getValue();
+    } 
+    else if (theEvent.isController()) {
+      Globals.colorParameter = (int)theEvent.getController().getValue();
+    }
+    initWordColors();
+    resetView();
+  }
 }
 
 void resetView() {
@@ -269,12 +275,18 @@ void prepareWords() {
   LinkedList<Word> authors = new LinkedList<Word>();   
   it = Globals.authors.entrySet().iterator();
   boolean charsMarked = charsMarked();
+  colorMode(HSB);
   for (int i = 0; it.hasNext(); i++) {
     Map.Entry pairs = (Map.Entry)it.next();
     Author a = (Author)pairs.getValue();
-    int val = a.sizeParameter(Globals.sizeParameter);
+    int val = a.getSizeParameter(Globals.sizeParameter);
     if (val > a.minSizeParameter(Globals.sizeParameter, charsMarked)) {
-      authors.add(new Word(a.name, val));
+      Word newWord = new Word(a.name, val);
+      String param = a.getColorParameter(Globals.colorParameter);
+      float hue = 255*colors.getColor(param);
+      newWord.setColor(color(hue >= 0 ? hue : 0,
+                             255*1.0, hue < 0 ? 0.0 : 255*0.5));
+      authors.add(newWord);
       valid++;
     }        
   }
@@ -330,11 +342,64 @@ void initWordCloud() {
 }
 
 void drawWordCloud(int n) {
+  if (! legend) {
+    drawLegend();
+    legend = true;
+  }
   for (int i = 0; i < n; i++) {
     if (wc.hasMore()) {
       wc.drawNext();
     }
   }
+}
+
+void initWordColors() {
+  colors.clear();
+  Iterator it = Globals.authors.entrySet().iterator();
+  while (it.hasNext()) {
+    Map.Entry pairs = (Map.Entry)it.next();
+    Author a = (Author)pairs.getValue();
+    colors.add(a.getColorParameter(Globals.colorParameter),
+               a.getSizeParameter(Globals.sizeParameter));
+  }
+  colors.generateColors();
+  legend = false;
+}
+
+void drawLegend() {
+  int xOffset = 10, yOffset = -20;
+  boolean newRow = false;
+  for (int i = 0; i < colors.numColors; i++) {
+    if (i%3 == 0) { xOffset = 10; yOffset += 20; }
+    drawLegendElement(xOffset, yOffset,
+                      colors.legendColors[i], colors.legendValues[i]);
+    xOffset += 250; //(20 + 8 * colors.legendValues[i].length());
+  }
+  if (colors.numColors % 3 == 0) { xOffset = 10; yOffset += 20; }
+  drawLegendElement(xOffset, yOffset,
+                    colors.legendColors[colors.numColors],
+                    colors.legendValues[colors.numColors]);
+}
+
+void drawLegendElement(int xOffset, int yOffset,
+                       float hueValue, String valueName) {
+  println(valueName);
+  int y = Globals.FRAME_HEIGHT - 70 + yOffset;
+  colorMode(HSB);
+  rectMode(CORNER);
+  stroke(1);
+  if (hueValue < 0) {
+    fill(0, 255, 0);
+  }
+  else {
+    fill(255*hueValue, 255*1.0, 255*0.5);
+  }
+  rect(xOffset, y, 14, 14);
+
+  
+  textAlign(LEFT);
+  textFont(createFont("Copse", 12));
+  text(valueName, xOffset + 20, y + 12);
 }
 
 void customizeDropdown(DropdownList ddl, String title, String[] options) {

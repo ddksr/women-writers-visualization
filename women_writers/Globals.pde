@@ -15,7 +15,11 @@ static class Globals {
 
   // Color options
   public static String colorOptionTitle = "Barva besed";
-  public static String[] colorOptions = {};
+  public static String[] colorOptions = {
+    "Vecinski tip receptorja", "Vecinski tip dela"
+  };
+  public static final int COLOR_OPTION_RECEPTOR_TYPE = 0,
+    COLOR_OPTION_WORK_TYPE = 1;
 
   // States
   public static HashMap<String, Author> authors;
@@ -23,7 +27,7 @@ static class Globals {
   public static boolean[] pressedChars = new boolean [26];
   public static int countAuthors = 0, countReceptions = 0, countWorks = 0;
   public static int sizeParameter = SIZE_OPTION_NUM_OF_WORKS;
-  public static int colorParameter = 0;
+  public static int colorParameter = COLOR_OPTION_WORK_TYPE;
   
   // Helpers
   public static boolean validChar(int c) {
