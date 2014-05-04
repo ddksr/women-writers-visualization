@@ -89,6 +89,8 @@ class Author {
       return majorityReceptorType;
     case Globals.COLOR_OPTION_WORK_TYPE:
       return majorityWorkType;
+    case Globals.COLOR_OPTION_COUNTRY:
+      return country;
     default:
       return majorityReceptorType;
     }

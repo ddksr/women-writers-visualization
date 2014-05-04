@@ -74,7 +74,7 @@ class ColorManager {
       numColors = i+1;
     }
     legendColors[numColors] = -1;
-    legendValues[numColors] = new String("unknown");
+    legendValues[numColors] = new String("Other or Unknown");
   }
 
   public float getColor(String element) {

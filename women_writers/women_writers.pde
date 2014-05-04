@@ -139,6 +139,11 @@ void draw() {
     // show author info
     
   }
+  if (mouseY > 150 && mouseY < (Globals.FRAME_HEIGHT - 100)) {
+    cursor(HAND);
+  } else {
+    cursor(ARROW);
+  }
   clear(); // currently important but maybe we won't need it
   // because we will redraw the cloud when a dropdown changes
 }
@@ -198,6 +203,18 @@ void gui() {
     checkbox.addItem(alphabet[i] + "", i);
   }
 }
+// for word cloud
+void mouseClicked() {
+  if (wc != null) {
+    Word word = wc.getWordAt(mouseX, mouseY);
+    if (word != null) {
+      println(word);
+      Globals.selectedAuthor = (Author)word.getProperty("info");
+      println(Globals.selectedAuthor);
+    }
+  }
+}
+
 //for checkbox
 void keyPressed() {
   if (key==' ') {
@@ -286,6 +303,7 @@ void prepareWords() {
       float hue = 255*colors.getColor(param);
       newWord.setColor(color(hue >= 0 ? hue : 0,
                              255*1.0, hue < 0 ? 0.0 : 255*0.5));
+      newWord.setProperty("info", a);
       authors.add(newWord);
       valid++;
     }        
@@ -383,7 +401,6 @@ void drawLegend() {
 
 void drawLegendElement(int xOffset, int yOffset,
                        float hueValue, String valueName) {
-  println(valueName);
   int y = Globals.FRAME_HEIGHT - 70 + yOffset;
   colorMode(HSB);
   rectMode(CORNER);
