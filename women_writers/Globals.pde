@@ -7,10 +7,10 @@ static class Globals {
   // Size options
   public static String sizeOptionTitle = "Velikost besed";
   public static String[] sizeOptions = {
-    "Stevilo receptorjev", "Stevilo del"
+    "Stevilo receptorjev", "Stevilo del", "Age"
   };
   public static final int SIZE_OPTION_NUM_OF_RECEPTIONS = 0,
-    SIZE_OPTION_NUM_OF_WORKS = 1;
+    SIZE_OPTION_NUM_OF_WORKS = 1, SIZE_OPTION_AGE = 2;
 
 
   // Color options

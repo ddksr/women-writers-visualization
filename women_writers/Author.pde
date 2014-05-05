@@ -23,6 +23,10 @@ class Author {
   public int numOfWorks() {
     return works.size();
   };
+
+  public int age() {
+    return yBirth > 0 && yDeath > 0 ? (yDeath - yBirth) : 0;
+  }
   
   public int getSizeParameter(int type) {
     switch(type) {
@@ -30,6 +34,8 @@ class Author {
       return numOfReceptions();
     case Globals.SIZE_OPTION_NUM_OF_WORKS:
       return numOfWorks();
+    case Globals.SIZE_OPTION_AGE:
+      return age();
     default:
       return numOfReceptions();
     }
@@ -41,6 +47,8 @@ class Author {
       return charMode ? 4 : 7;
     case Globals.SIZE_OPTION_NUM_OF_WORKS:
       return charMode ? 4 : 7;
+    case Globals.SIZE_OPTION_AGE:
+      return charMode ? 40 : 50;
     default:
       return charMode ? 4 : 7;
     }    
