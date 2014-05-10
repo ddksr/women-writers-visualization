@@ -196,15 +196,19 @@ void drawAuthorInfo(Author a) {
   int minX = 0, minY = Globals.VIEW_MODE_INFO_AUTHOR_PANEL_HEIGHT + Globals.VIEW_MODE_INFO_AUTHOR_PANEL_POSITION_Y;
   int maxX = Globals.FRAME_WIDTH, maxY = Globals.FRAME_HEIGHT;
   int vpWidth = maxX-minX, vpHeight = maxY - minY;
+  int classMode = 0;
+    
+  ArrayList<Integer> years = new ArrayList<Integer>();
+  ArrayList<Integer> works = new ArrayList<Integer>();
+  ArrayList<Integer> receptions = new ArrayList<Integer>();
 
-  // clear where the range controller is
-  fill(230);
-  rect(minX, minY, vpWidth, vpHeight);
-  
   if (! authorViewDrawInitialized) {
     // Here is the code that will be run only once: the first time this method is colled
 
-    a.prepareDistributions(Globals.YEAR_DISTRIBUTION_MODE); 
+    classMode = 10;// first mode is 10 because we look at a 10-year span, (it can be 5, 2 ... anything for that matter)
+    
+    
+    a.prepareDistributions(classMode); 
     authorViewDrawInitialized = true;
     
 
@@ -215,30 +219,15 @@ void drawAuthorInfo(Author a) {
     println(a.yFirstMention); // when was author first mentioned of had fist work published
     println(a.yFirstClass); // what is the authors first class
     println(a.yLastClass); // what is the authors first class
-    
-    ArrayList<Integer> years = new ArrayList<Integer>();
-    ArrayList<Integer> works = new ArrayList<Integer>();
-    ArrayList<Integer> receptions = new ArrayList<Integer>();
-    
-
-    if ((a.yLastClass - a.yFirstClass) >= 10 ) {
-      yearRangeValues[0] = a.yFirstClass;
-      yearRangeValues[1] = a.yLastClass;
-      yearRange.setRange(a.yFirstClass,a.yLastClass)
-        .show()
-        .setRangeValues(yearRangeValues[0], yearRangeValues[1]);
-    }
-    else {
-      yearRange.hide();
-    }
 
     
-    for (int year = a.yFirstClass; year <= a.yLastClass; year += Globals.YEAR_DISTRIBUTION_MODE) {
-
+    for (int year = a.yFirstClass; year <= a.yLastClass; year += classMode) {
       Integer yearClass = new Integer(year);
       Integer val1 = a.distYearWorks.get(yearClass);
       Integer val2 = a.distYearReceptions.get(yearClass);
-      
+      years.add(year);
+      works.add(val1);
+      receptions.add(val2);
       
       print(year + ": ");
       if (val1 != null) {
@@ -260,15 +249,9 @@ void drawAuthorInfo(Author a) {
   
   // here goes the code for drawing author info bound by minX, minY, maxX, maxY
   // TODO:
-  /**
-  int[] years = {1999,2000,2001,2002,2003};
-  //Author.receptions for year 2000
-  String[] receptions = {"A","B"};
-  //Author.works for year 1999
-  String[] works = {"D","E","F","G","d","s","w","w"};**/
   
-  PFont font = createFont("Arial", 20,true); 
-  int offset = 150;
+  PFont font = createFont("Arial", 10,true); 
+  int offset = 30;
   
   textFont(font);
   fill (25, 50, 100);
@@ -276,27 +259,35 @@ void drawAuthorInfo(Author a) {
   strokeWeight (2);
   Float lenYear = (float) vpWidth/years.size();
   
-  for (int i=0; i<years.length; i++){
+  for (int i=0; i<years.size(); i++){
     line(i*lenYear+offset,minY+(vpHeight/2)-20,i*lenYear+offset,minY+(vpHeight/2)+20);
     strokeWeight (1);
     fill(0);
-    text(years[i], i*lenYear+offset-10,minY+(vpHeight/2)+60);
-    //example only for year 2000 and 1999
-    int sizeOfReceptions = receptions.length;
-    int sizeOfWorks = works.length;
+    text(years.get(i), i*lenYear+offset-10,minY+(vpHeight/2)+60);
     
-    if (years[i]==1999){
-      //draw works published in year 1999
-      fill(255,0,0);
-      ellipseMode(CENTER);
-      ellipse(i*lenYear+offset,minY+(vpHeight/4),10*sizeOfWorks,10*sizeOfWorks);
-    }
-    if (years[i]==2000){
-      //draw rec
+    if (receptions.get(i) != null){
+      //draw receptions
       fill(200,2,130);
       ellipseMode(CENTER);
-      ellipse(i*lenYear+offset,minY+(vpHeight/4),10*sizeOfReceptions,10*sizeOfReceptions);
+      ellipse(i*lenYear+offset,minY+(vpHeight/4),Math.round((( (float)10/classMode )*receptions.get(i))),Math.round((( (float)10/classMode )*receptions.get(i))));
     }
+    if (works.get(i) != null){
+      //draw works
+      fill(255,0,0);
+      ellipseMode(CENTER);
+      ellipse(i*lenYear+offset,minY+(vpHeight/4),Math.round((( (float)10/classMode )*works.get(i))),Math.round((( (float)10/classMode )*works.get(i))));
+    }
+    if (works.get(i) != null){
+      //text
+      fill(0);
+      text("W = " + works.get(i), i*lenYear+offset,minY+(vpHeight/4)-50);
+    }
+    if (receptions.get(i) != null){
+      //text
+      fill(0);
+      text("R = " + receptions.get(i), i*lenYear+offset,minY+(vpHeight/4)-80);
+    }
+    
     
     
   }
@@ -392,9 +383,9 @@ void authorInfoGui() {
     ;
 
   yearRange = cp5.addRange("rangeController")
-             // disable broadcasting since setRange and setRangeValues will trigger an event
+    // disable broadcasting since setRange and setRangeValues will trigger an event
     .setBroadcast(false) 
-    .setPosition(Globals.FRAME_WIDTH - 300,20)
+    .setPosition(Globals.FRAME_WIDTH - 300,30)
     .setLabel("Year range")
     .setSize(200,15)
     // after the initialization we turn broadcast back on again
@@ -402,7 +393,7 @@ void authorInfoGui() {
     .setColorForeground(color(255,40))
     .setColorBackground(color(255,40))
     .setGroup(groupAuthorInfo)
-             ;
+    ;
   
 }
 
