@@ -7,6 +7,9 @@ class Author {
   public LinkedList<Work> works;
   public LinkedList<Receptor> receptors;
 
+  public int yFirstMention = Integer.MAX_VALUE,
+    yFirstClass = Integer.MAX_VALUE, yLastClass = Integer.MIN_VALUE;
+  
   public String majorityReceptorType, majorityWorkType;
   public Author() {
     works = new LinkedList<Work>();
@@ -102,5 +105,55 @@ class Author {
     default:
       return majorityReceptorType;
     }
+  }
+
+  
+  public HashMap<Integer, Integer> distYearWorks;
+  public HashMap<Integer, Integer> distYearReceptions;
+  public void prepareDistributions(int mode) {
+    distYearWorks = new HashMap<Integer, Integer>();
+    distYearReceptions = new HashMap<Integer, Integer>();
+    
+    for (Work w : works) {
+      int year = w.year;
+      if (year == 0) { continue; } // skip
+      if (year < yFirstMention) { yFirstMention = year; }
+      int yClass = yearToClass(year, mode);
+      if (yClass < yFirstClass) { yFirstClass = yClass; }
+      if (yClass > yLastClass) { yLastClass = yClass; }
+      
+      Integer classKey = new Integer(yClass);
+      Integer val;
+      if (distYearWorks.containsKey(classKey)) {
+        val = new Integer(((Integer)distYearWorks.get(classKey)).intValue() + 1);
+      }
+      else {
+        val = new Integer(1);
+      }
+      distYearWorks.put(classKey, val);
+    }
+
+    for (Receptor r : receptors) {
+      int year = r.yReception;
+      if (year == 0) { continue; } // skip
+      
+      int yClass = yearToClass(year, mode);
+      if (yClass < yFirstClass) { yFirstClass = yClass; }
+      if (yClass > yLastClass) { yLastClass = yClass; }
+      Integer classKey = new Integer(yClass);
+      Integer val;
+      if (distYearReceptions.containsKey(classKey)) {
+        val = ((Integer)distYearReceptions.get(classKey)).intValue();
+        val = new Integer(val + 1);
+      }
+      else {
+        val = new Integer(1);
+      }
+      distYearReceptions.put(classKey, val);
+    }
+  }
+
+  private int yearToClass(int year, int mode) {
+    return year/mode*mode;
   }
 }

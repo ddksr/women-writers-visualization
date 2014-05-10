@@ -15,6 +15,7 @@ boolean clear = true;
 boolean loading = true;
 boolean legend = false;
 boolean authorViewInitialized = false;
+boolean authorViewDrawInitialized = false;
 MySQL conn;
 Word[] words = null;
 //words to display on current selection
@@ -145,8 +146,8 @@ void draw() {
     clear(); // currently important but maybe we won't need it
   }
   else if (Globals.viewMode == Globals.VIEW_MODE_INFO) {
-    if (Globals.selectedAuthor != null) {
-      Author a = Globals.selectedAuthor;
+    Author a = Globals.selectedAuthor;
+    if (a != null) {
       Globals.selectedAuthor = null;
 
       if (authorViewInitialized == false) {
@@ -181,19 +182,57 @@ void draw() {
         if (life.length() > 0) { life = ", " + life; }
         aiCountryLanguage.setText(countryLanguage + life);
       }
-      drawInfo();
+      drawAuthorInfo(a);
     }
   }
   // because we will redraw the cloud when a dropdown changes
 }
 
-void drawInfo() {
+void drawAuthorInfo(Author a) {
   // Viewport is bound!!! 
   int minX = 0, minY = Globals.VIEW_MODE_INFO_AUTHOR_PANEL_HEIGHT + Globals.VIEW_MODE_INFO_AUTHOR_PANEL_POSITION_Y;
   int maxX = Globals.FRAME_WIDTH, maxY = Globals.FRAME_HEIGHT;
   int vpWidth = maxX-minX, vpHeight = maxY - minY;
-  Author a = Globals.selectedAuthor;
 
+  if (! authorViewDrawInitialized) {
+    // Here is the code that will be run only once: the first time this method is colled
+
+    int classMode = 10;// first mode is 10 because we look at a 10-year span, (it can be 5, 2 ... anything for that matter)
+    
+    
+    a.prepareDistributions(classMode); 
+    authorViewDrawInitialized = true;
+    
+
+    // This is just debug code to see if distributions work
+    // TODO: remove
+    // PRI MUNDT KLARA SE TOLE NAJBOLJS VIDI KAK DELUJE =) 
+    println(a);
+    println(a.yFirstMention); // when was author first mentioned of had fist work published
+    println(a.yFirstClass); // what is the authors first class
+    println(a.yLastClass); // what is the authors first class
+    for (int year = a.yFirstClass; year <= a.yLastClass; year += classMode) {
+      Integer yearClass = new Integer(year);
+      Integer val1 = a.distYearWorks.get(yearClass);
+      Integer val2 = a.distYearReceptions.get(yearClass);
+      print(year + ": ");
+      if (val1 != null) {
+        print(val1.intValue() + " ");
+      }
+      else {
+        print("0 ");
+      }
+      if (val2 != null) {
+        print(val2.intValue() + " ");
+      }
+      else {
+        print("0 ");
+      }
+      println();
+    }
+  }
+  
+  
   // here goes the code for drawing author info bound by minX, minY, maxX, maxY
   // TODO:
 
@@ -417,6 +456,7 @@ void resetView() {
   words = null;
   legend = false;
   authorViewInitialized = false;
+  authorViewDrawInitialized = false;
 }
 
 void prepareWords() {
