@@ -16,6 +16,7 @@ boolean loading = true;
 boolean legend = false;
 boolean authorViewInitialized = false;
 boolean authorViewDrawInitialized = false;
+
 MySQL conn;
 Word[] words = null;
 //words to display on current selection
@@ -151,8 +152,6 @@ void draw() {
   else if (Globals.viewMode == Globals.VIEW_MODE_INFO) {
     Author a = Globals.selectedAuthor;
     if (a != null) {
-      Globals.selectedAuthor = null;
-
       if (authorViewInitialized == false) {
         resetView();
         cursor(ARROW);
@@ -196,8 +195,7 @@ void drawAuthorInfo(Author a) {
   int minX = 0, minY = Globals.VIEW_MODE_INFO_AUTHOR_PANEL_HEIGHT + Globals.VIEW_MODE_INFO_AUTHOR_PANEL_POSITION_Y;
   int maxX = Globals.FRAME_WIDTH, maxY = Globals.FRAME_HEIGHT;
   int vpWidth = maxX-minX, vpHeight = maxY - minY;
-  int classMode = 0;
-    
+  int classMode = Globals.YEAR_DISTRIBUTION_MODE;
   ArrayList<Integer> years = new ArrayList<Integer>();
   ArrayList<Integer> works = new ArrayList<Integer>();
   ArrayList<Integer> receptions = new ArrayList<Integer>();
@@ -205,46 +203,38 @@ void drawAuthorInfo(Author a) {
   if (! authorViewDrawInitialized) {
     // Here is the code that will be run only once: the first time this method is colled
 
-    classMode = 20;// first mode is 10 because we look at a 10-year span, (it can be 5, 2 ... anything for that matter)
-    
-    
-    a.prepareDistributions(classMode); 
-    authorViewDrawInitialized = true;
-    
+    a.prepareDistributions(classMode);
 
-    // This is just debug code to see if distributions work
-    // TODO: remove
-    // PRI MUNDT KLARA SE TOLE NAJBOLJS VIDI KAK DELUJE =) 
-    println(a);
-    println(a.yFirstMention); // when was author first mentioned of had fist work published
-    println(a.yFirstClass); // what is the authors first class
-    println(a.yLastClass); // what is the authors first class
-
-    
-    for (int year = a.yFirstClass; year <= a.yLastClass; year += classMode) {
-      Integer yearClass = new Integer(year);
-      Integer val1 = a.distYearWorks.get(yearClass);
-      Integer val2 = a.distYearReceptions.get(yearClass);
-      years.add(year);
-      works.add(val1);
-      receptions.add(val2);
-      
-      print(year + ": ");
-      if (val1 != null) {
-        print(val1.intValue() + " ");
-      }
-      else {
-        print("0 ");
-      }
-      if (val2 != null) {
-        print(val2.intValue() + " ");
-      }
-      else {
-        print("0 ");
-      }
-      println();
+    yearRangeValues = new int[] {
+      a.yFirstClass, a.yLastClass
+    };
+    yearRange.setMin(a.yFirstClass)
+      .setMax(a.yLastClass)
+      .setHandleSize(50)
+      .setRange(a.yFirstClass,a.yLastClass)
+      .setRangeValues(a.yFirstClass, a.yLastClass)
+      .show();
+    if (a.yLastClass - a.yFirstClass < Globals.MIN_YEAR_RANGE) {
+      yearRange.hide();
     }
+    
+    authorViewDrawInitialized = true;
   }
+
+  // CLEAR
+  fill(230);
+  rect(minX, minY, maxX-minX, maxY-minY);
+
+  for (int year = yearRangeValues[0]; year <= yearRangeValues[1]; year += classMode) {
+    Integer yearClass = new Integer(year);
+    Integer val1 = a.distYearWorks.get(yearClass);
+    Integer val2 = a.distYearReceptions.get(yearClass);
+    years.add(year);
+    works.add(val1 != null ? val1.intValue() : 0);
+    receptions.add(val2 != null ? val2.intValue() : 0);
+  }
+    
+
   
   
   // here goes the code for drawing author info bound by minX, minY, maxX, maxY
@@ -404,7 +394,7 @@ void authorInfoGui() {
 
   yearRange = cp5.addRange("rangeController")
     // disable broadcasting since setRange and setRangeValues will trigger an event
-    .setBroadcast(false) 
+    .setBroadcast(true) 
     .setPosition(30,Globals.FRAME_HEIGHT - 300)
     .setLabel("Year range")
     .setSize(200,15)
@@ -508,7 +498,7 @@ void controlEvent(ControlEvent theEvent) {
     initWordColors();
     resetView();
   }
-  if(theEvent.isFrom("rangeController")) {
+  if(theEvent.isFrom(yearRange)) {
     // min and max values are stored in an array.
     // access this array with controller().arrayValue().
     // min is at index 0, max is at index 1.
@@ -516,7 +506,8 @@ void controlEvent(ControlEvent theEvent) {
       second = (int)(theEvent.getController().getArrayValue(1));
     yearRangeValues[0] = Globals.yearToClass(first, Globals.YEAR_DISTRIBUTION_MODE);
     yearRangeValues[1] = Globals.yearToClass(second, Globals.YEAR_DISTRIBUTION_MODE);
-    println("range update, done.");
+    print("range update, done. new values: ");
+    println(yearRangeValues[0] + " <-> " + yearRangeValues[1]);
   }
 }
 
