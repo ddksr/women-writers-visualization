@@ -400,18 +400,18 @@ void authorInfoGui() {
     .setSize(200,15)
     // after the initialization we turn broadcast back on again
     //.setBroadcast(true)
-    .setColorCaptionLabel(0)
+    .setColorCaptionLabel(120)
     .setColorTickMark(120)
     .setColorValueLabel(40)
     .setWidth(Globals.FRAME_WIDTH - 100)
-    .setMin(1300)
-    .setMax(2014)
+    //.setMin(1300)
+    //.setMax(2014)
     .setHandleSize(50)
-    .setRange(1300,2014)//we need to show integers, not floats...
-    .setRangeValues(1300, 2014)
+    //.setRange(1300,2014)//we need to show integers, not floats...
+    //.setRangeValues(1300, 2014)
     .setNumberOfTickMarks(10)
-    .setColorForeground(color(255,40))
-    .setColorBackground(color(255,40))
+    //.setColorForeground(color(255,40))
+    //.setColorBackground(color(255,40))
     .setGroup(groupAuthorInfo)
     ;
   

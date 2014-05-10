@@ -6,7 +6,7 @@ static class Globals {
   public static final int VIEW_MODE_INFO_AUTHOR_PANEL_POSITION_Y = 150;
   public static final int VIEW_MODE_INFO_AUTHOR_PANEL_HEIGHT = 200;
   public static final int YEAR_DISTRIBUTION_MODE = 20;
-  public static final int MIN_YEAR_RANGE = 10;
+  public static final int MIN_YEAR_RANGE = 50;
   
   // Size options
   public static String sizeOptionTitle = "Velikost besed";
