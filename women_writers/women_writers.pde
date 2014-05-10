@@ -183,6 +183,7 @@ void draw() {
         }
         if (life.length() > 0) { life = ", " + life; }
         aiCountryLanguage.setText(countryLanguage + life);
+       
       }
       drawAuthorInfo(a);
     }
@@ -215,6 +216,7 @@ void drawAuthorInfo(Author a) {
       .setRangeValues(a.yFirstClass, a.yLastClass)
       .show();
     if (a.yLastClass - a.yFirstClass < Globals.MIN_YEAR_RANGE) {
+      println("has to be hiden");
       yearRange.hide();
     }
     
@@ -298,7 +300,16 @@ void drawAuthorInfo(Author a) {
       text(receptions.get(i), i*lenYear+offset*2,minY+(vpHeight/4)-80);
     }
     
-    
+     
+    //legend for works and recetions
+    fill(#2BAF00);
+    ellipseMode(RADIUS);
+    ellipse(100,Globals.FRAME_HEIGHT - 100,10,10);
+    text("Število receptorjev", 100 + offset,Globals.FRAME_HEIGHT - 100);
+    fill(#0500AF);
+    ellipseMode(RADIUS);
+    ellipse(300,Globals.FRAME_HEIGHT - 100,10,10);
+    text("Število objavljenih del", 300 + offset,Globals.FRAME_HEIGHT - 100);
     
   }
 }
@@ -331,21 +342,21 @@ void gui() {
   cp5 = new ControlP5(this);
   
   ddSize = cp5.addDropdownList("size")
-    .setPosition(10, 20)
+    .setPosition(20, 40)
     .setSize(150, 100) // this somehow also influences the open dropdown size (NOTE: somehow)
     ;
   customizeDropdown(ddSize, Globals.sizeOptionTitle, Globals.sizeOptions);
   ddSize.setIndex(10);
 
   ddColor = cp5.addDropdownList("color")
-    .setPosition(160, 20)
+    .setPosition(200, 40)
     .setSize(150, 100) // this somehow also influences the open dropdown size (NOTE: somehow)
     ;
   customizeDropdown(ddColor, Globals.colorOptionTitle, Globals.colorOptions);
   ddSize.setIndex(10);
   
   checkbox = cp5.addCheckBox("checkBox")
-    .setPosition(600, 20)
+    .setPosition(450, 20)
     .setColorForeground(color(120))
     .setColorActive(color(200))
     .setColorLabel(color(50))
@@ -372,7 +383,7 @@ void gui() {
 
 void authorInfoGui() {
   cp5.addButton("aiButtonClose")
-    .setPosition(Globals.FRAME_WIDTH - 40,10)
+    .setPosition(Globals.FRAME_WIDTH - 60,10)
     .setSize(30,19)
     .setLabel("Close")
     .setGroup(groupAuthorInfo)
@@ -654,7 +665,7 @@ void drawLegendElement(int xOffset, int yOffset,
 
 void customizeDropdown(DropdownList ddl, String title, String[] options) {
   // a convenience function to customize a DropdownList
-  ddl.setBackgroundColor(color(190));
+  ddl.setBackgroundColor(color(120));
   ddl.setItemHeight(15);
   ddl.setBarHeight(15);
   ddl.captionLabel().set(title);
@@ -665,6 +676,6 @@ void customizeDropdown(DropdownList ddl, String title, String[] options) {
     ddl.addItem(options[i], i);
   }
   //ddl.scroll(0);
-  ddl.setColorBackground(color(60));
-  ddl.setColorActive(color(255, 128));
+  //ddl.setColorBackground(color(0));
+  ddl.setColorActive(200);
 }
