@@ -260,23 +260,43 @@ void drawAuthorInfo(Author a) {
   Float lenYear = (float) vpWidth/years.size();
   
   for (int i=0; i<years.size(); i++){
+    Boolean receptionsFirst = true;
     line(i*lenYear+offset,minY+(vpHeight/2)-20,i*lenYear+offset,minY+(vpHeight/2)+20);
     strokeWeight (1);
     fill(0);
     text(years.get(i), i*lenYear+offset-10,minY+(vpHeight/2)+60);
     
-    if (receptions.get(i) != null){
-      //draw receptions
-      fill(200,2,130);
-      ellipseMode(CENTER);
-      ellipse(i*lenYear+offset,minY+(vpHeight/4),Math.round((( (float)10/classMode )*receptions.get(i))),Math.round((( (float)10/classMode )*receptions.get(i))));
-    }
-    if (works.get(i) != null){
-      //draw works
-      fill(255,0,0);
-      ellipseMode(CENTER);
-      ellipse(i*lenYear+offset,minY+(vpHeight/4),Math.round((( (float)10/classMode )*works.get(i))),Math.round((( (float)10/classMode )*works.get(i))));
-    }
+    //wich circle goes on top
+    if (receptions.size() < works.size()) receptionsFirst = false;
+     if (receptionsFirst){
+           if (receptions.get(i) != null){
+              //draw receptions first
+              fill(200,2,130);
+              ellipseMode(RADIUS);
+              ellipse(i*lenYear+offset,minY+(vpHeight/4),Math.round((( (float)1/classMode )*receptions.get(i))),Math.round((( (float)1/classMode )*receptions.get(i))));
+            }
+            if (works.get(i) != null){
+              //draw works
+              fill(255,0,0);
+              ellipseMode(RADIUS);
+              ellipse(i*lenYear+offset,minY+(vpHeight/4),Math.round((( (float)1/classMode )*works.get(i))),Math.round((( (float)1/classMode )*works.get(i))));
+            }
+     }else{
+            if (works.get(i) != null){
+              //draw works first
+              fill(255,0,0);
+              ellipseMode(RADIUS);
+              ellipse(i*lenYear+offset,minY+(vpHeight/4),Math.round((( (float)1/classMode )*works.get(i))),Math.round((( (float)1/classMode )*works.get(i))));
+            }
+           if (receptions.get(i) != null){
+              //draw receptions
+              fill(200,2,130);
+              ellipseMode(RADIUS);
+              ellipse(i*lenYear+offset,minY+(vpHeight/4),Math.round((( (float)1/classMode )*receptions.get(i))),Math.round((( (float)1/classMode )*receptions.get(i))));
+            }
+     }
+    
+
     if (works.get(i) != null){
       //text
       fill(0);
@@ -385,7 +405,7 @@ void authorInfoGui() {
   yearRange = cp5.addRange("rangeController")
     // disable broadcasting since setRange and setRangeValues will trigger an event
     .setBroadcast(false) 
-    .setPosition(Globals.FRAME_WIDTH - 300,30)
+    .setPosition(Globals.FRAME_WIDTH - 300,20)
     .setLabel("Year range")
     .setSize(200,15)
     // after the initialization we turn broadcast back on again
