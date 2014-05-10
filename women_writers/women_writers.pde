@@ -240,14 +240,8 @@ void drawAuthorInfo(Author a) {
     receptions.add(val2 != null ? val2.intValue() : 0);
   }
     
-
-  
-  
-  // here goes the code for drawing author info bound by minX, minY, maxX, maxY
-  // TODO:
-  
-  PFont font = createFont("Arial", 10,true); 
-  int offset = 30;
+  PFont font = createFont("Copse", 12,true); 
+  int offset = 50;
   
   textFont(font);
   fill (25, 50, 100);
@@ -260,7 +254,8 @@ void drawAuthorInfo(Author a) {
     line(i*lenYear+offset,minY+(vpHeight/2)-20,i*lenYear+offset,minY+(vpHeight/2)+20);
     strokeWeight (1);
     fill(0);
-    text(years.get(i), i*lenYear+offset-10,minY+(vpHeight/2)+60);
+    textAlign(CENTER);
+    text(years.get(i), i*lenYear+offset,minY+(vpHeight/2)+50);
     
     //wich circle goes on top
     if (receptions.size() < works.size()) receptionsFirst = false;
@@ -296,29 +291,29 @@ void drawAuthorInfo(Author a) {
     if (works.get(i) != null){
       //text
       fill(#0500AF);
-      text(works.get(i), i*lenYear+offset*2,minY+(vpHeight/4)-50);
+      textAlign(CENTER);
+      text(works.get(i), i*lenYear+offset,minY+(vpHeight/4)-80);
     }
     if (receptions.get(i) != null){
       //text
       fill(#2BAF00);
-      text(receptions.get(i), i*lenYear+offset*2,minY+(vpHeight/4)-80);
+      textAlign(CENTER);
+      text(receptions.get(i), i*lenYear+offset,minY+(vpHeight/4)+80);
     }
-    
-    
-     
-    //legend for works and recetions
-    fill(#2BAF00);
-    ellipseMode(RADIUS);
-    ellipse(100,Globals.FRAME_HEIGHT - 100,10,10);
-    text("Število receptorjev", 100 + offset,Globals.FRAME_HEIGHT - 100);
-    fill(#0500AF);
-    ellipseMode(RADIUS);
-    ellipse(300,Globals.FRAME_HEIGHT - 100,10,10);
-    text("Število objavljenih del", 300 + offset,Globals.FRAME_HEIGHT - 100);
-   
-
-    
+        
   }
+
+  textAlign(LEFT);
+  textFont(font);
+  //legend for works and recetions
+  fill(#2BAF00);
+  ellipseMode(RADIUS);
+  ellipse(100,Globals.FRAME_HEIGHT - 100,10,10);
+  text("Number of receptions", 85 + offset,Globals.FRAME_HEIGHT - 100 + 5);
+  fill(#0500AF);
+  ellipseMode(RADIUS);
+  ellipse(300,Globals.FRAME_HEIGHT - 100,10,10);
+  text("Number of works", 285 + offset,Globals.FRAME_HEIGHT - 100 + 5);
 }
 
 void clear() {
@@ -349,14 +344,14 @@ void gui() {
   cp5 = new ControlP5(this);
   
   ddSize = cp5.addDropdownList("size")
-    .setPosition(20, 40)
+    .setPosition(20, 35)
     .setSize(150, 100) // this somehow also influences the open dropdown size (NOTE: somehow)
     ;
   customizeDropdown(ddSize, Globals.sizeOptionTitle, Globals.sizeOptions);
   ddSize.setIndex(10);
 
   ddColor = cp5.addDropdownList("color")
-    .setPosition(200, 40)
+    .setPosition(200, 35)
     .setSize(150, 100) // this somehow also influences the open dropdown size (NOTE: somehow)
     ;
   customizeDropdown(ddColor, Globals.colorOptionTitle, Globals.colorOptions);
@@ -397,14 +392,14 @@ void authorInfoGui() {
     .setGroup(groupAuthorInfo)
     ;
   aiTitle = cp5.addTextlabel("authorName")
-    .setPosition(10, 10)
+    .setPosition(15, 10)
     .setColor(color(30))
     .setText("Author")
     .setFont(createFont("Copse", 26))
     .setGroup(groupAuthorInfo)
     ;
   aiCountryLanguage = cp5.addTextlabel("authorCountry")
-    .setPosition(10, 50)
+    .setPosition(15, 50)
     .setColor(color(30))
     .setText("Country")
     .setFont(createFont("Copse", 20))
@@ -414,9 +409,9 @@ void authorInfoGui() {
   yearRange = cp5.addRange("rangeController")
     // disable broadcasting since setRange and setRangeValues will trigger an event
     .setBroadcast(true) 
-    .setPosition(30,Globals.FRAME_HEIGHT - 300)
+    .setPosition(35,Globals.FRAME_HEIGHT - 300)
     .setLabel("Year range")
-    .setSize(200,15)
+    .setSize(190,15)
     // after the initialization we turn broadcast back on again
     //.setBroadcast(true)
     .setColorCaptionLabel(120)
@@ -525,8 +520,7 @@ void controlEvent(ControlEvent theEvent) {
       second = (int)(theEvent.getController().getArrayValue(1));
     yearRangeValues[0] = Globals.yearToClass(first, Globals.YEAR_DISTRIBUTION_MODE);
     yearRangeValues[1] = Globals.yearToClass(second, Globals.YEAR_DISTRIBUTION_MODE);
-    print("range update, done. new values: ");
-    println(yearRangeValues[0] + " <-> " + yearRangeValues[1]);
+
   }
 }
 
