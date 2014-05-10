@@ -205,7 +205,7 @@ void drawAuthorInfo(Author a) {
   if (! authorViewDrawInitialized) {
     // Here is the code that will be run only once: the first time this method is colled
 
-    classMode = 10;// first mode is 10 because we look at a 10-year span, (it can be 5, 2 ... anything for that matter)
+    classMode = 20;// first mode is 10 because we look at a 10-year span, (it can be 5, 2 ... anything for that matter)
     
     
     a.prepareDistributions(classMode); 
@@ -271,41 +271,41 @@ void drawAuthorInfo(Author a) {
      if (receptionsFirst){
            if (receptions.get(i) != null){
               //draw receptions first
-              fill(200,2,130);
+              fill(#2BAF00);
               ellipseMode(RADIUS);
-              ellipse(i*lenYear+offset,minY+(vpHeight/4),Math.round((( (float)1/classMode )*receptions.get(i))),Math.round((( (float)1/classMode )*receptions.get(i))));
+              ellipse(i*lenYear+offset,minY+(vpHeight/4),Math.round((( (float)2/classMode )*receptions.get(i))),Math.round((( (float)2/classMode )*receptions.get(i))));
             }
             if (works.get(i) != null){
               //draw works
-              fill(255,0,0);
+              fill(#0500AF);
               ellipseMode(RADIUS);
-              ellipse(i*lenYear+offset,minY+(vpHeight/4),Math.round((( (float)1/classMode )*works.get(i))),Math.round((( (float)1/classMode )*works.get(i))));
+              ellipse(i*lenYear+offset,minY+(vpHeight/4),Math.round((( (float)2/classMode )*works.get(i))),Math.round((( (float)2/classMode )*works.get(i))));
             }
      }else{
             if (works.get(i) != null){
               //draw works first
-              fill(255,0,0);
+              fill(#0500AF);
               ellipseMode(RADIUS);
-              ellipse(i*lenYear+offset,minY+(vpHeight/4),Math.round((( (float)1/classMode )*works.get(i))),Math.round((( (float)1/classMode )*works.get(i))));
+              ellipse(i*lenYear+offset,minY+(vpHeight/4),Math.round((( (float)2/classMode )*works.get(i))),Math.round((( (float)2/classMode )*works.get(i))));
             }
            if (receptions.get(i) != null){
               //draw receptions
-              fill(200,2,130);
+              fill(#2BAF00);
               ellipseMode(RADIUS);
-              ellipse(i*lenYear+offset,minY+(vpHeight/4),Math.round((( (float)1/classMode )*receptions.get(i))),Math.round((( (float)1/classMode )*receptions.get(i))));
+              ellipse(i*lenYear+offset,minY+(vpHeight/4),Math.round((( (float)2/classMode )*receptions.get(i))),Math.round((( (float)2/classMode )*receptions.get(i))));
             }
      }
     
 
     if (works.get(i) != null){
       //text
-      fill(0);
-      text("W = " + works.get(i), i*lenYear+offset,minY+(vpHeight/4)-50);
+      fill(#0500AF);
+      text(works.get(i), i*lenYear+offset*2,minY+(vpHeight/4)-50);
     }
     if (receptions.get(i) != null){
       //text
-      fill(0);
-      text("R = " + receptions.get(i), i*lenYear+offset,minY+(vpHeight/4)-80);
+      fill(#2BAF00);
+      text(receptions.get(i), i*lenYear+offset*2,minY+(vpHeight/4)-80);
     }
     
     
@@ -405,11 +405,21 @@ void authorInfoGui() {
   yearRange = cp5.addRange("rangeController")
     // disable broadcasting since setRange and setRangeValues will trigger an event
     .setBroadcast(false) 
-    .setPosition(Globals.FRAME_WIDTH - 300,20)
+    .setPosition(30,Globals.FRAME_HEIGHT - 300)
     .setLabel("Year range")
     .setSize(200,15)
     // after the initialization we turn broadcast back on again
     //.setBroadcast(true)
+    .setColorCaptionLabel(0)
+    .setColorTickMark(120)
+    .setColorValueLabel(40)
+    .setWidth(Globals.FRAME_WIDTH - 100)
+    .setMin(1300)
+    .setMax(2014)
+    .setHandleSize(50)
+    .setRange(1300,2014)//we need to show integers, not floats...
+    .setRangeValues(1300, 2014)
+    .setNumberOfTickMarks(10)
     .setColorForeground(color(255,40))
     .setColorBackground(color(255,40))
     .setGroup(groupAuthorInfo)
