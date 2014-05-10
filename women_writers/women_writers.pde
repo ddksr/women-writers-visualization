@@ -14,6 +14,7 @@ import wordcram.*;
 boolean clear = true;
 boolean loading = true;
 boolean legend = false;
+boolean authorViewInitialized = false;
 MySQL conn;
 Word[] words = null;
 //words to display on current selection
@@ -141,44 +142,100 @@ void draw() {
     } else {
       cursor(ARROW);
     }
+    clear(); // currently important but maybe we won't need it
   }
   else if (Globals.viewMode == Globals.VIEW_MODE_INFO) {
     if (Globals.selectedAuthor != null) {
       Author a = Globals.selectedAuthor;
       Globals.selectedAuthor = null;
-      resetView();
-      cursor(ARROW);
-      colorMode(HSB);
-      background(230);
-      groupAuthorInfo.show();
-      aiTitle.setText(a.name);
-      String countryLanguage = new String(a.country != null ? a.country : "Country unknown");
-      countryLanguage += ", ";
-      countryLanguage += a.language != null ? a.language : "Language unknown";
+
+      if (authorViewInitialized == false) {
+        resetView();
+        cursor(ARROW);
+        colorMode(HSB);
+        background(230);
+        groupAuthorInfo.show();
+        loading = false;
+        authorViewInitialized = true;
+
+        aiTitle.setText(a.name);
+        String countryLanguage = new String(a.country != null ? a.country : "Country unknown");
+        countryLanguage += ", ";
+        countryLanguage += a.language != null ? a.language : "Language unknown";
       
 
-      String life = new String("");
-      if (a.yBirth > 0) { life = new String("* " + a.yBirth); }
-      if (a.yBirth > 0 && a.yDeath > 0) {
-        life += new String(" † " + a.yBirth);
+        String life = new String("");
+        if (a.yBirth > 0) { life = new String("* " + a.yBirth); }
+        if (a.yBirth > 0 && a.yDeath > 0) {
+          life += new String(" † " + a.yBirth);
+        }
+        else if (a.yDeath > 0) {
+          life = new String("* unknown † " + a.yBirth);
+        }
+        else if (a.yDeath == 0) {
+          life = new String("Born " + life.substring(2));
+        }
+        else {
+          life = new String("Year of birth and death unknown");
+        }
+        if (life.length() > 0) { life = ", " + life; }
+        aiCountryLanguage.setText(countryLanguage + life);
       }
-      else if (a.yDeath > 0) {
-        life = new String("* unknown † " + a.yBirth);
-      }
-      else if (a.yDeath == 0) {
-        life = new String("Born " + life.substring(2));
-      }
-      else {
-        life = new String("Year of birth and death unknown");
-      }
-      if (life.length() > 0) { life = ", " + life; }
-      aiCountryLanguage.setText(countryLanguage + life);
-
+      drawInfo();
     }
   }
-  
-  clear(); // currently important but maybe we won't need it
   // because we will redraw the cloud when a dropdown changes
+}
+
+void drawInfo() {
+  // Viewport is bound!!! 
+  int minX = 0, minY = Globals.VIEW_MODE_INFO_AUTHOR_PANEL_HEIGHT + Globals.VIEW_MODE_INFO_AUTHOR_PANEL_POSITION_Y;
+  int maxX = Globals.FRAME_WIDTH, maxY = Globals.FRAME_HEIGHT;
+  int vpWidth = maxX-minX, vpHeight = maxY - minY;
+  Author a = Globals.selectedAuthor;
+
+  // here goes the code for drawing author info bound by minX, minY, maxX, maxY
+  // TODO:
+
+  int[] years = {1999,2000,2001,2002,2003};
+  //Author.receptions for year 2000
+  String[] receptions = {"A","B"};
+  //Author.works for year 1999
+  String[] works = {"D","E","F","G","d","s","w","w"};
+  
+  PFont font = createFont("Arial", 20,true); 
+  int offset = 150;
+  
+  textFont(font);
+  fill (25, 50, 100);
+  line(0, minY+vpHeight/2, vpWidth, minY+vpHeight/2);
+  strokeWeight (2);
+  Float lenYear = (float) vpWidth/years.length;
+  
+  for (int i=0; i<years.length; i++){
+    line(i*lenYear+offset,minY+(vpHeight/2)-20,i*lenYear+offset,minY+(vpHeight/2)+20);
+    strokeWeight (1);
+    fill(0);
+    text(years[i], i*lenYear+offset-10,minY+(vpHeight/2)+60);
+    //example only for year 2000 and 1999
+    int sizeOfReceptions = receptions.length;
+    int sizeOfWorks = works.length;
+    
+    if (years[i]==1999){
+      //draw works published in year 1999
+      fill(255,0,0);
+      ellipseMode(CENTER);
+      ellipse(i*lenYear+offset,minY+(vpHeight/4),10*sizeOfWorks,10*sizeOfWorks);
+    }
+    if (years[i]==2000){
+      //draw rec
+      fill(200,2,130);
+      ellipseMode(CENTER);
+      ellipse(i*lenYear+offset,minY+(vpHeight/4),10*sizeOfReceptions,10*sizeOfReceptions);
+    }
+    
+    
+  }
 }
 
 void clear() {
@@ -236,11 +293,11 @@ void gui() {
   }
 
   groupAuthorInfo = cp5.addGroup("g2")
-    .setPosition(0,150)
+    .setPosition(0,Globals.VIEW_MODE_INFO_AUTHOR_PANEL_POSITION_Y)
     .setWidth(Globals.FRAME_WIDTH)
     .activateEvent(true)
     .setBackgroundColor(color(230))
-    .setBackgroundHeight(Globals.FRAME_HEIGHT - 170)
+    .setBackgroundHeight(Globals.VIEW_MODE_INFO_AUTHOR_PANEL_HEIGHT)
     .setLabel("Author info")
     .hide()
     .hideBar()
@@ -276,12 +333,11 @@ void aiButtonClose() {
   resetView();
   Globals.viewMode = Globals.VIEW_MODE_CLOUD;
   groupAuthorInfo.hide();
-  
 }
 
 // for word cloud
 void mouseClicked() {
-  if (wc != null) {
+  if (wc != null && Globals.viewMode == Globals.VIEW_MODE_CLOUD) {
     Word word = wc.getWordAt(mouseX, mouseY);
     if (word != null) {
       Globals.selectedAuthor = (Author)word.getProperty("info");
@@ -360,6 +416,7 @@ void resetView() {
   loading = true;
   words = null;
   legend = false;
+  authorViewInitialized = false;
 }
 
 void prepareWords() {
@@ -405,7 +462,7 @@ public List<Word> getAuthors (){
     }
 
   }
-   return list;
+  return list;
 }
 
 boolean charsMarked() {

@@ -3,6 +3,9 @@ static class Globals {
   public static final int VIEW_MODE_CLOUD = 0, VIEW_MODE_INFO = 1;
   public static final int FRAME_WIDTH=1000, FRAME_HEIGHT=800;
   public static final int WORD_CLOUD_WIDTH=600, WORD_CLOUD_HEIGHT=600;
+  public static final int VIEW_MODE_INFO_AUTHOR_PANEL_POSITION_Y = 150;
+  public static final int VIEW_MODE_INFO_AUTHOR_PANEL_HEIGHT = 200;
+  
   
   // Size options
   public static String sizeOptionTitle = "Velikost besed";
