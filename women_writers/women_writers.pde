@@ -174,7 +174,7 @@ void draw() {
         String life = new String("");
         if (a.yBirth > 0) { life = new String("* " + a.yBirth); }
         if (a.yBirth > 0 && a.yDeath > 0) {
-          life += new String(" † " + a.yBirth);
+          life += new String(" † " + a.yDeath);
         }
         else if (a.yDeath > 0) {
           life = new String("* unknown † " + a.yBirth);
