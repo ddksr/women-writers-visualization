@@ -1,5 +1,0 @@
-class Database {
-  String user     = "username";
-  String pass     = "password";
-  String database = "database";
-}

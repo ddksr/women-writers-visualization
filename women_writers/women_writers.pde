@@ -211,10 +211,17 @@ void drawAuthorInfo(Author a) {
     println(a.yFirstMention); // when was author first mentioned of had fist work published
     println(a.yFirstClass); // what is the authors first class
     println(a.yLastClass); // what is the authors first class
+    
+    ArrayList<Integer> years = new ArrayList<Integer>();
+    ArrayList<Integer> works = new ArrayList<Integer>();
+    ArrayList<Integer> receptions = new ArrayList<Integer>();
+    
     for (int year = a.yFirstClass; year <= a.yLastClass; year += classMode) {
       Integer yearClass = new Integer(year);
       Integer val1 = a.distYearWorks.get(yearClass);
       Integer val2 = a.distYearReceptions.get(yearClass);
+      
+      
       print(year + ": ");
       if (val1 != null) {
         print(val1.intValue() + " ");
@@ -235,12 +242,12 @@ void drawAuthorInfo(Author a) {
   
   // here goes the code for drawing author info bound by minX, minY, maxX, maxY
   // TODO:
-
+  /**
   int[] years = {1999,2000,2001,2002,2003};
   //Author.receptions for year 2000
   String[] receptions = {"A","B"};
   //Author.works for year 1999
-  String[] works = {"D","E","F","G","d","s","w","w"};
+  String[] works = {"D","E","F","G","d","s","w","w"};**/
   
   PFont font = createFont("Arial", 20,true); 
   int offset = 150;
@@ -249,7 +256,7 @@ void drawAuthorInfo(Author a) {
   fill (25, 50, 100);
   line(0, minY+vpHeight/2, vpWidth, minY+vpHeight/2);
   strokeWeight (2);
-  Float lenYear = (float) vpWidth/years.length;
+  Float lenYear = (float) vpWidth/years.size();
   
   for (int i=0; i<years.length; i++){
     line(i*lenYear+offset,minY+(vpHeight/2)-20,i*lenYear+offset,minY+(vpHeight/2)+20);
