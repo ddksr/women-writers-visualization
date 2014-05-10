@@ -5,7 +5,7 @@ static class Globals {
   public static final int WORD_CLOUD_WIDTH=600, WORD_CLOUD_HEIGHT=600;
   public static final int VIEW_MODE_INFO_AUTHOR_PANEL_POSITION_Y = 150;
   public static final int VIEW_MODE_INFO_AUTHOR_PANEL_HEIGHT = 200;
-  
+  public static final int YEAR_DISTRIBUTION_MODE = 10;
   
   // Size options
   public static String sizeOptionTitle = "Velikost besed";
@@ -37,5 +37,8 @@ static class Globals {
   // Helpers
   public static boolean validChar(int c) {
     return c >=0 && c < 26;
+  }
+  public static int yearToClass(int year, int mode) {
+    return year/mode*mode;
   }
 }

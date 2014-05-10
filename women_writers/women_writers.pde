@@ -26,6 +26,8 @@ ColorManager colors = new ColorManager();
 CheckBox checkbox;
 char[] alphabet = {'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'};
 
+int[] yearRangeValues = new int[2];
+
 // ControlP5
 ControlP5 cp5;
 ControlWindow controlWindow;
@@ -33,6 +35,7 @@ Canvas cc;
 Group groupAuthorInfo;
 DropdownList ddSize, ddColor;
 Textlabel aiTitle, aiCountryLanguage;
+Range yearRange;
 
 boolean sqlConnect() {
   conn = new MySQL(this, Database.host, Database.database, Database.user, Database.pass);
@@ -194,13 +197,14 @@ void drawAuthorInfo(Author a) {
   int maxX = Globals.FRAME_WIDTH, maxY = Globals.FRAME_HEIGHT;
   int vpWidth = maxX-minX, vpHeight = maxY - minY;
 
+  // clear where the range controller is
+  fill(230);
+  rect(minX, minY, vpWidth, vpHeight);
+  
   if (! authorViewDrawInitialized) {
     // Here is the code that will be run only once: the first time this method is colled
 
-    int classMode = 10;// first mode is 10 because we look at a 10-year span, (it can be 5, 2 ... anything for that matter)
-    
-    
-    a.prepareDistributions(classMode); 
+    a.prepareDistributions(Globals.YEAR_DISTRIBUTION_MODE); 
     authorViewDrawInitialized = true;
     
 
@@ -216,7 +220,21 @@ void drawAuthorInfo(Author a) {
     ArrayList<Integer> works = new ArrayList<Integer>();
     ArrayList<Integer> receptions = new ArrayList<Integer>();
     
-    for (int year = a.yFirstClass; year <= a.yLastClass; year += classMode) {
+
+    if ((a.yLastClass - a.yFirstClass) >= 10 ) {
+      yearRangeValues[0] = a.yFirstClass;
+      yearRangeValues[1] = a.yLastClass;
+      yearRange.setRange(a.yFirstClass,a.yLastClass)
+        .show()
+        .setRangeValues(yearRangeValues[0], yearRangeValues[1]);
+    }
+    else {
+      yearRange.hide();
+    }
+
+    
+    for (int year = a.yFirstClass; year <= a.yLastClass; year += Globals.YEAR_DISTRIBUTION_MODE) {
+
       Integer yearClass = new Integer(year);
       Integer val1 = a.distYearWorks.get(yearClass);
       Integer val2 = a.distYearReceptions.get(yearClass);
@@ -373,6 +391,19 @@ void authorInfoGui() {
     .setGroup(groupAuthorInfo)
     ;
 
+  yearRange = cp5.addRange("rangeController")
+             // disable broadcasting since setRange and setRangeValues will trigger an event
+    .setBroadcast(false) 
+    .setPosition(Globals.FRAME_WIDTH - 300,20)
+    .setLabel("Year range")
+    .setSize(200,15)
+    // after the initialization we turn broadcast back on again
+    //.setBroadcast(true)
+    .setColorForeground(color(255,40))
+    .setColorBackground(color(255,40))
+    .setGroup(groupAuthorInfo)
+             ;
+  
 }
 
 void aiButtonClose() {
@@ -455,6 +486,16 @@ void controlEvent(ControlEvent theEvent) {
     }
     initWordColors();
     resetView();
+  }
+  if(theEvent.isFrom("rangeController")) {
+    // min and max values are stored in an array.
+    // access this array with controller().arrayValue().
+    // min is at index 0, max is at index 1.
+    int first = (int)(theEvent.getController().getArrayValue(0)),
+      second = (int)(theEvent.getController().getArrayValue(1));
+    yearRangeValues[0] = Globals.yearToClass(first, Globals.YEAR_DISTRIBUTION_MODE);
+    yearRangeValues[1] = Globals.yearToClass(second, Globals.YEAR_DISTRIBUTION_MODE);
+    println("range update, done.");
   }
 }
 

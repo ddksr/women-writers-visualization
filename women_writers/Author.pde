@@ -118,7 +118,7 @@ class Author {
       int year = w.year;
       if (year == 0) { continue; } // skip
       if (year < yFirstMention) { yFirstMention = year; }
-      int yClass = yearToClass(year, mode);
+      int yClass = Globals.yearToClass(year, mode);
       if (yClass < yFirstClass) { yFirstClass = yClass; }
       if (yClass > yLastClass) { yLastClass = yClass; }
       
@@ -137,7 +137,7 @@ class Author {
       int year = r.yReception;
       if (year == 0) { continue; } // skip
       
-      int yClass = yearToClass(year, mode);
+      int yClass = Globals.yearToClass(year, mode);
       if (yClass < yFirstClass) { yFirstClass = yClass; }
       if (yClass > yLastClass) { yLastClass = yClass; }
       Integer classKey = new Integer(yClass);
@@ -153,7 +153,5 @@ class Author {
     }
   }
 
-  private int yearToClass(int year, int mode) {
-    return year/mode*mode;
-  }
+  
 }
