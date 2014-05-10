@@ -128,9 +128,13 @@ void draw() {
     background(230);
     textAlign(CENTER);
     textFont(font);
-    fill(0);
-    text("Loading ... ", Globals.FRAME_WIDTH / 2, Globals.FRAME_HEIGHT / 2);
-
+    fill(201,38,93);
+    //text("Loading ... ", Globals.FRAME_WIDTH / 2 -100, Globals.FRAME_HEIGHT / 2);
+    //add img
+    PImage img;
+    img = loadImage("ww2.png");
+    image(img, Globals.FRAME_WIDTH / 2 - 180, Globals.FRAME_HEIGHT / 2 - 80);
+    text(" ... ", Globals.FRAME_WIDTH / 2, Globals.FRAME_HEIGHT / 2 + 60);
     loading = false;
   }
   else if (Globals.viewMode == Globals.VIEW_MODE_CLOUD) {
@@ -183,7 +187,7 @@ void draw() {
         }
         if (life.length() > 0) { life = ", " + life; }
         aiCountryLanguage.setText(countryLanguage + life);
-       
+
       }
       drawAuthorInfo(a);
     }
@@ -300,6 +304,7 @@ void drawAuthorInfo(Author a) {
       text(receptions.get(i), i*lenYear+offset*2,minY+(vpHeight/4)-80);
     }
     
+    
      
     //legend for works and recetions
     fill(#2BAF00);
@@ -310,6 +315,8 @@ void drawAuthorInfo(Author a) {
     ellipseMode(RADIUS);
     ellipse(300,Globals.FRAME_HEIGHT - 100,10,10);
     text("Število objavljenih del", 300 + offset,Globals.FRAME_HEIGHT - 100);
+   
+
     
   }
 }
@@ -368,6 +375,7 @@ void gui() {
     checkbox.addItem(alphabet[i] + "", i);
   }
 
+  
   groupAuthorInfo = cp5.addGroup("g2")
     .setPosition(0,Globals.VIEW_MODE_INFO_AUTHOR_PANEL_POSITION_Y)
     .setWidth(Globals.FRAME_WIDTH)
